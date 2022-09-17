@@ -24,7 +24,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf import FlaskForm
 import wtforms
-from wtforms.validators import DataRequired, URL
+from wtforms.validators import DataRequired
 import pandas as pd
 import datetime as dt
 import functools
