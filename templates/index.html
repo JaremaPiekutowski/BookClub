@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<!--
+	Verti by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Wymieniamy się książkami na Kindle'a</title>
+		<link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!-- Font Awesome icons (free version)-->
+    	<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="static/assets/css/main.css" />
+	</head>
+	<body class="is-preload homepage">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<div id="header-wrapper">
+					<header id="header" class="container">
+
+						<!-- Logo -->
+							<div id="logo">
+								<h1><a href="{{ url_for('home') }}">Wymieniamy się książkami na Kindle'a</a></h1>
+							</div>
+
+						<!-- Nav -->
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li class="current"><a href="{{ url_for('home') }}">Strona główna</a></li>
+									<li><a href="{{ url_for('books') }}">Baza książek</a></li>
+									<li><a href="{{ url_for('submit_book') }}">Dodaj książkę</a></li>
+								</ul>
+							</nav>
+
+					</header>
+				</div>
+
+			<!-- Banner -->
+				<div id="banner-wrapper">
+					<div id="banner" class="box container">
+						<div class="row">
+<!--							<div class="col-6 col-12-medium">-->
+							<div class="col-6">
+								<h2>Nie wrzucili książek w bieżącym półroczu:</h2>
+								<ul>
+									{% for user in users_to_warn %}
+									<li>{{user}}</li>
+									{% endfor %}
+								</ul>
+							</div>
+<!--							<div class="col-6 col-12-medium">-->
+							<div class="col-6">
+								<h2>Najnowsze książki:</h2>
+								<br>
+								{% for book in newest_books %}
+								<p><em>{{book[1]}}</em> - {{book[0]}}</p>
+								{% endfor %}
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+		<!-- Footer -->
+				<div id="footer-wrapper">
+					<footer id="footer" class="container">
+						<div class="row">
+							<!-- Contact -->
+							<div id="contact">
+								<h3><a href="https://www.facebook.com/groups/1080648392010480">Profil na FB - link</a></h3>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<div id="copyright">
+									<ul class="menu">
+										<li>&copy; Jarema Piekutowski. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</footer>
+				</div>
+
+			</div>
+
+		<!-- Scripts -->
+
+			<script src="static/assets/js/jquery.min.js"></script>
+			<script src="static/assets/js/jquery.dropotron.min.js"></script>
+			<script src="static/assets/js/browser.min.js"></script>
+			<script src="static/assets/js/breakpoints.min.js"></script>
+			<script src="static/assets/js/util.js"></script>
+			<script src="static/assets/js/main.js"></script>
+
+	</body>
+</html>

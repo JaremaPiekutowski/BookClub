@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<!--
+	Verti by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Baza książek</title>
+		<link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!-- Font Awesome icons (free version)-->
+    	<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="static/assets/css/main.css" />
+	</head>
+	<body class="is-preload no-sidebar">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<div id="header-wrapper">
+					<header id="header" class="container">
+
+						<!-- Logo -->
+							<div id="logo">
+								<h1><a href="{{ url_for('home') }}">Wymieniamy się książkami na Kindle'a</a></h1>
+							</div>
+
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li class="current"><a href="{{ url_for('home') }}">Strona główna</a></li>
+									<li><a href="{{ url_for('books') }}">Baza książek</a></li>
+									<li><a href="{{ url_for('submit_book') }}">Dodaj książkę</a></li>
+								</ul>
+							</nav>
+
+					</header>
+				</div>
+
+			<!-- Main -->
+				<div id="main-wrapper">
+					<div class="container" id="book-table">
+					  <div class="row">
+						<div class="col-sm-12">
+
+						  <h1>Wszystkie książki</h1>
+
+						  <table class="table">
+								<thead>
+									<tr>
+										{% for column_name in columns %}
+											<th scope="col">{{column_name}}</th>
+										{% endfor %}
+									</tr>
+							  </thead>
+							  <tbody>
+								{% for row in books %}
+									<tr>
+										{% for element in row[:5] %}
+											<td>{{element}}</td>
+										{% endfor %}
+										{% if row[5] != "brak" %}
+											<td><a href="{{ row[5] }}" target="_blank">Recenzja</a></td>
+										{% else %}
+											<td>brak</td>
+										{% endif %}
+									</tr>
+								{% endfor %}
+							  </tbody>
+						  </table>
+
+						  <p><a href="{{ url_for ('home') }}">Powrót do strony głównej</a></p>
+
+						</div>
+					  </div>
+					</div>
+				</div>
+
+		<!-- Footer -->
+				<div id="footer-wrapper">
+					<footer id="footer" class="container">
+						<div class="row">
+							<!-- Contact -->
+							<div id="contact">
+								<h3><a href="https://www.facebook.com/groups/1080648392010480">Profil na FB - link</a></h3>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-12">
+								<div id="copyright">
+									<ul class="menu">
+										<li>&copy; Jarema Piekutowski. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</footer>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- Scripts -->
+
+		<script src="static/assets/js/jquery.min.js"></script>
+		<script src="static/assets/js/jquery.dropotron.min.js"></script>
+		<script src="static/assets/js/browser.min.js"></script>
+		<script src="static/assets/js/breakpoints.min.js"></script>
+		<script src="static/assets/js/util.js"></script>
+		<script src="static/assets/js/main.js"></script>
+
+	</body>
+</html>

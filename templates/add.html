@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Dodawanie książki</title>
+		<link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!-- Font Awesome icons (free version)-->
+    	<script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="static/assets/css/main.css" />
+	</head>
+	<body class="is-preload no-sidebar">
+		<div id="page-wrapper">
+
+			<!-- Header -->
+				<div id="header-wrapper">
+					<header id="header" class="container">
+
+						<!-- Logo -->
+							<div id="logo">
+								<h1><a href="{{ url_for('home') }}">Wymieniamy się książkami na Kindle'a</a></h1>
+								<h2>{{ info }}</h2>
+							</div>
+
+						<!-- Nav -->
+							<nav id="nav">
+								<ul>
+									<li class="current"><a href="{{ url_for('home') }}">Strona główna</a></li>
+									<li><a href="{{ url_for('books') }}">Baza książek</a></li>
+									<li><a href="{{ url_for('submit_book') }}">Dodaj książkę</a></li>
+								</ul>
+							</nav>
+
+					</header>
+				</div>
+
+			<!-- Main wrapper -->
+				<div id="main-wrapper">
+					<div class="container">
+						<h1>Dodaj książkę</h1>
+						<form method="POST" action="{{ url_for('submit_book') }}" novalidate>
+							{{ form.csrf_token }}
+    						<div>{{ form.author.label }}{{ form.author() }}</div>
+							<div>{{ form.title.label }}{{ form.title() }}</div>
+							{% for error in form.title.errors %}
+							<p class="error-message">{{ error }}</p>
+							{% endfor %}
+							<div>{{ form.genre.label }}{{ form.genre() }}</div>
+							<div>{{ form.user.label }}{{ form.user() }}</div>
+							<div>{{ form.review.label }}{{ form.review() }}</div>
+							<div>{{ form.submit }} </div>
+						</form>
+						<a href="{{ url_for('home') }}">Powrót do strony głównej</a>
+					</div>
+				</div>
+
+			<!-- Footer -->
+				<footer id="footer" class="container">
+					<div class="row">
+						<!-- Contact -->
+						<div id="contact">
+							<h3><a href="https://www.facebook.com/groups/1080648392010480">Profil na FB - link</a></h3>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-12">
+							<div id="copyright">
+								<ul class="menu">
+									<li>&copy; Jarema Piekutowski. All rights reserved</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</footer>
+		</div>
+
+		<!-- Scripts -->
+
+		<script src="static/assets/js/jquery.min.js"></script>
+		<script src="static/assets/js/jquery.dropotron.min.js"></script>
+		<script src="static/assets/js/browser.min.js"></script>
+		<script src="static/assets/js/breakpoints.min.js"></script>
+		<script src="static/assets/js/util.js"></script>
+		<script src="static/assets/js/main.js"></script>
+
+	</body>
+</html>
