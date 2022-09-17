@@ -43,7 +43,6 @@ app.config["SECRET_KEY"] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 # Get books
 def get_books() -> pd.DataFrame:
     data = pd.read_excel("static/data/bookdata.xlsx", index_col=0)
-    print(data)
     data['Tytuł'] = data['Tytuł'].astype(str)
     data['Data'] = pd.to_datetime(data['Data']).dt.date
     return data
