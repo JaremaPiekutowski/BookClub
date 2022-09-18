@@ -1551,9 +1551,9 @@ input, select, textarea {
 		border: 0;
 	}
 
-/* Error message */
+/* Error message, add info message */
 
-.error-message {
+.error-message, .add-info {
     color: #ff0000;
 }
 
@@ -1960,10 +1960,6 @@ input, select, textarea {
 			vertical-align: middle;
 		}
 
-		#logo h2 {
-			color: #f00;
-			font-size: 1.5em;
-		}
 
 		#logo span {
 			font-weight: 800;

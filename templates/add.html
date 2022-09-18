@@ -19,7 +19,6 @@
 						<!-- Logo -->
 							<div id="logo">
 								<h1><a href="{{ url_for('home') }}">Wymieniamy się książkami na Kindle'a</a></h1>
-								<h2>{{ info }}</h2>
 							</div>
 
 						<!-- Nav -->
@@ -50,7 +49,8 @@
 							<div>{{ form.review.label }}{{ form.review() }}</div>
 							<div>{{ form.submit }} </div>
 						</form>
-						<a href="{{ url_for('home') }}">Powrót do strony głównej</a>
+						<h2 class="add-info">{{ info }}</h2>
+						<h3><a href="{{ url_for('home') }}">Powrót do strony głównej</a></h3>
 					</div>
 				</div>
 
