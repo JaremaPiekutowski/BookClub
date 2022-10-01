@@ -36,10 +36,7 @@
 #  Book add route: date to serial number
 
 
-
 import os
-
-import numpy as np
 from flask import Flask, render_template
 from flask_wtf import FlaskForm
 import wtforms
