@@ -60,7 +60,7 @@
 										{% for element in row[:5] %}
 											<td>{{element}}</td>
 										{% endfor %}
-										{% if row[5] != "brak" %}
+										{% if row[5] != "brak" and row[5] != '' %}
 											<td><a href="{{ row[5] }}" target="_blank">Recenzja</a></td>
 										{% else %}
 											<td>brak</td>

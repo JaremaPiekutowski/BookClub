@@ -1,12 +1,18 @@
 # TODO - v2.0:
-#  User ranking
-#  Table sorting and filtering - dropdown
-#  Book search - form
-#  User stats - form + search
-#  Book adding - dropdown for genre
+#  New Heroku deployment: Authentication to env/Heroku config variables
+#     https://devcenter.heroku.com/articles/config-vars
+#  Add user ranking
+
+# TODO - v3.0:
+#  Add table sorting and filtering - dropdown
+#  Add book search - form
+#  Add user stats - form + search
+#  Add book adding - dropdown for genre
 #  Book adding - add new user
-#  Better responsive table - column labels
-#  Database to SQL?
+#  Make the table more responsive - add column labels in small version https://css-tricks.com/responsive-data-tables
+
+# TODO - v4.0:
+#  Logging in
 
 
 # DONE:
@@ -21,9 +27,20 @@
 #  FIXED: Table sorting
 #  Add info that a book's been added BELOW the form - add.html/main.py
 #  Prevent adding the same book another time (check [author and title] duplicates)
+#  Installed and imported firebase (NO COMMIT YET)
+#  Created a firebase of books
+#  Complete migration to Firebase
+#  Security issue 1: Flask SECRET_KEY to env
+#  Adding books to firebase
+#  Replace "1899-12-31" by "brak"
+#  Book add route: date to serial number
 
 
-from flask import Flask, render_template, request, redirect, url_for
+
+import os
+
+import numpy as np
+from flask import Flask, render_template
 from flask_wtf import FlaskForm
 import wtforms
 from wtforms.validators import DataRequired
@@ -31,45 +48,66 @@ import pandas as pd
 import datetime as dt
 import functools
 import locale
-
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+import xlrd
 
 # Set locale
 locale.setlocale(locale.LC_ALL, '')
 
+# Create credentials
+cred = credentials.Certificate('firebase-sdk.json')  # Change to  env variables later
+
+# Initialize app
+firebase_admin.initialize_app(cred,
+                              {'databaseURL': 'https://bookclub-b2db5-default-rtdb.europe-west1.firebasedatabase.app/'})
+
+# Set reference to the database
+ref = db.reference("/books")
+
 # APP
 # Create the app
 app = Flask(__name__)
-app.config["SECRET_KEY"] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config["SECRET_KEY"] = os.environ.get("FORM_SECRET_KEY")
 
 
 # Get book_database
 def get_books() -> pd.DataFrame:
-    data = pd.read_excel("static/data/bookdata.xlsx", index_col=0)
-    data['Tytuł'] = data['Tytuł'].astype(str)
-    data['Data'] = pd.to_datetime(data['Data']).dt.date
-    return data
+    # Get data
+    data = ref.get()
+    print(data)
+    print(type(data))
+    all_books = pd.DataFrame()
+    if isinstance(data, list):
+        all_books = pd.DataFrame(data[1:])
+    elif isinstance(data, dict):
+        all_books = pd.DataFrame([value for key, value in data.items()])
+    print(all_books)
+    # Clean the data, dealing with ''
+    all_books['data'] = [upload_date if len(str(upload_date)) == 5 else 0 for upload_date in all_books['data']]
+    # Convert serial number to date
+    all_books['data'] = [xlrd.xldate_as_datetime(upload_date, 0).date() for upload_date in all_books['data']]
+    all_books['tytul'] = all_books['tytul'].astype(str)
+    return all_books
 
 
 # Get users
 def get_users() -> list:
-    return sorted(get_books()['Wrzucający'].dropna().unique().tolist())
+    return sorted(get_books()['wrzucajacy'].dropna().unique().tolist())
 
 
 # Prepare data to display
 def prepare_to_display(data: pd.DataFrame) -> dict:
-    data_to_display = data.fillna(value="brak").iloc[:,:7].drop_duplicates(subset='Tytuł').copy()
-    data_to_display = data_to_display.set_index('Tytuł')
+    data_to_display = data.fillna(value="brak").iloc[:, :7].drop_duplicates(subset='tytul').copy()
+    data_to_display = data_to_display.set_index('tytul')
+    data_to_display['data'] = [upload_date if upload_date > dt.date(1900, 1, 1) else "brak" for upload_date in data_to_display['data']]
     data_to_display = data_to_display.reindex(sorted(data_to_display.index,
                                                      key=functools.cmp_to_key(locale.strcoll))).reset_index()
-    data_to_display = data_to_display.iloc[:, [1,0,2,3,4,5]]
-    return {'columns': data_to_display.columns, 'values': data_to_display.values.tolist()}
-
-
-# Add book
-def add_book(book):
-    data = pd.read_excel("static/data/bookdata.xlsx", index_col=0)
-    data.loc[len(data)+1] = book
-    data.to_excel("static/data/bookdata.xlsx")
+    data_to_display = data_to_display.iloc[:, [0, 1, 2, 3, 5, 4]]
+    print(data_to_display.columns)
+    return {'columns': ['Tytuł', 'Autor', 'Data', 'Dziedzina', 'Wrzucający/a', 'Recenzja'],
+            'values': data_to_display.values.tolist()}
 
 
 # Get users who didn't add a book in current half-year
@@ -78,9 +116,9 @@ def get_users_to_warn(book_database: pd.DataFrame):
     current_year = dt.datetime.now().year
     start_month = 7 if current_month > 6 else 1
     start_date = dt.date(current_year, start_month, 1)
-    all_users = book_database.dropna(subset=['Wrzucający'], axis=0)['Wrzucający'].unique()
-    current_halfyear_data = book_database[book_database['Data'] > start_date]
-    current_halfyear_users = current_halfyear_data['Wrzucający'].unique()
+    all_users = book_database.dropna(subset=['wrzucajacy'], axis=0)['wrzucajacy'].unique()
+    current_halfyear_data = book_database[book_database['data'] > start_date]
+    current_halfyear_users = current_halfyear_data['wrzucajacy'].unique()
     raw_users = [user for user in all_users if user not in current_halfyear_users]
     users_to_warn = sorted([str(user) for user in raw_users])
     return users_to_warn
@@ -88,7 +126,14 @@ def get_users_to_warn(book_database: pd.DataFrame):
 
 # Get newest book_database
 def get_newest_books(book_database: pd.DataFrame):
-    return book_database.sort_values(by='Data', axis=0, ascending=False).head()[['Tytuł', 'Autor']].values
+    return book_database.sort_values(by='data', axis=0, ascending=False).head()[['tytul', 'autor']].values
+
+
+# Date to serial number for feeding JSON
+def serialize_date(date: dt.datetime):
+    temp = dt.datetime(1899, 12, 30)
+    delta = date - temp
+    return int(float(delta.days) + (float(delta.seconds) / 86400))
 
 
 # Book adding form
@@ -106,8 +151,8 @@ class BookForm(FlaskForm):
 @app.route('/')
 def home():
     return render_template('index.html',
-                           newest_books = get_newest_books(get_books()),
-                           users_to_warn = get_users_to_warn(get_books()))
+                           newest_books=get_newest_books(get_books()),
+                           users_to_warn=get_users_to_warn(get_books()))
 
 
 # Book view route
@@ -127,17 +172,17 @@ def submit_book():
     book_database = get_books()
     # Validate the form
     if form.validate_on_submit():
-        if form.author.data in book_database['Autor'].values and \
-                form.title.data in book_database['Tytuł'].values:
+        if form.author.data in book_database['autor'].values and \
+                form.title.data in book_database['tytul'].values:
             return render_template('add.html', form=form, info='Ta książka już jest w bazie')
         else:
-            new_book = [form.author.data,
-                        form.title.data,
-                        form.genre.data,
-                        form.user.data,
-                        dt.datetime.now().date(),
-                        form.review.data]
-            add_book(new_book)
+            new_book = {'autor': form.author.data,
+                        'data': serialize_date(dt.datetime.now()),
+                        'dziedzina': form.genre.data,
+                        'recenzja': form.review.data,
+                        'tytul': form.title.data,
+                        'wrzucajacy': form.user.data}
+            ref.push(new_book)
         return render_template('add.html', form=form, info=f'Dodano książkę pt. {form.title.data}')
     # Render template
     return render_template('add.html', form=form, info='')
