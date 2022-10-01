@@ -1,9 +1,5 @@
-# TODO - v2.0:
-#  New Heroku deployment: Authentication to env/Heroku config variables
-#     https://devcenter.heroku.com/articles/config-vars
-#  Add user ranking
-
 # TODO - v3.0:
+#  Add user ranking
 #  Add table sorting and filtering - dropdown
 #  Add book search - form
 #  Add user stats - form + search
@@ -34,6 +30,9 @@
 #  Adding books to firebase
 #  Replace "1899-12-31" by "brak"
 #  Book add route: date to serial number
+#  Authentication to env/Heroku config variables
+#  Heroku deployment
+#  Heroku config vars setting: https://devcenter.heroku.com/articles/config-vars
 
 
 import os
