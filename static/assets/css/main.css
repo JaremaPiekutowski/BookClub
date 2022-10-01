@@ -192,6 +192,12 @@ input, select, textarea {
 		margin-bottom: 2em;
 	}
 
+	.emphasized {
+	    display: inline;
+	    color:#790252;
+	    font-weight: 800;
+	}
+
 /* Container */
 
 	.container {

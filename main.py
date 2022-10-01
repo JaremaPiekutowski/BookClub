@@ -37,7 +37,8 @@
 
 
 import os
-from flask import Flask, render_template
+import json
+from flask import Flask, render_template, redirect, url_for
 from flask_wtf import FlaskForm
 import wtforms
 from wtforms.validators import DataRequired
@@ -53,15 +54,27 @@ import xlrd
 # Set locale
 locale.setlocale(locale.LC_ALL, '')
 
-# Create credentials
-cred = credentials.Certificate('firebase-sdk.json')  # Change to  env variables later
+
+# Set Firebase credentials
+my_credentials = {
+    "type": "service_account",
+    "project_id": "bookclub-b2db5",
+    "private_key_id": os.environ.get("PRIVATE_KEY_ID"),
+    "private_key": os.environ.get("PRIVATE_KEY").replace(r'\n', '\n'),
+    "client_email": os.environ.get("CLIENT_EMAIL"),
+    "client_id": os.environ.get("CLIENT_ID"),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-teiie%40bookclub-b2db5.iam.gserviceaccount.com"}
+
+cred = credentials.Certificate(my_credentials)
 
 # Initialize app
-firebase_admin.initialize_app(cred,
-                              {'databaseURL': 'https://bookclub-b2db5-default-rtdb.europe-west1.firebasedatabase.app/'})
+firebase_admin.initialize_app(cred, {'databaseURL': 'https://bookclub-b2db5-default-rtdb.europe-west1.firebasedatabase.app/'})
 
 # Set reference to the database
-ref = db.reference("/books")
+REF = db.reference("/books")
 
 # APP
 # Create the app
@@ -72,15 +85,12 @@ app.config["SECRET_KEY"] = os.environ.get("FORM_SECRET_KEY")
 # Get book_database
 def get_books() -> pd.DataFrame:
     # Get data
-    data = ref.get()
-    print(data)
-    print(type(data))
+    data = REF.get()
     all_books = pd.DataFrame()
     if isinstance(data, list):
         all_books = pd.DataFrame(data[1:])
     elif isinstance(data, dict):
         all_books = pd.DataFrame([value for key, value in data.items()])
-    print(all_books)
     # Clean the data, dealing with ''
     all_books['data'] = [upload_date if len(str(upload_date)) == 5 else 0 for upload_date in all_books['data']]
     # Convert serial number to date
@@ -135,7 +145,7 @@ def serialize_date(date: dt.datetime):
 
 # Book adding form
 class BookForm(FlaskForm):
-    author = wtforms.StringField(label='Autor (nazwisko, imię)')
+    author = wtforms.StringField(label='Autor')
     title = wtforms.StringField(label='Tytuł', validators=[DataRequired(message="Proszę wypełnić pole")])
     genre = wtforms.StringField(label='Dziedzina (np. powieść, poezja)')
     user = wtforms.SelectField(label='Wrzucający', choices=get_users())
@@ -179,8 +189,8 @@ def submit_book():
                         'recenzja': form.review.data,
                         'tytul': form.title.data,
                         'wrzucajacy': form.user.data}
-            ref.push(new_book)
-        return render_template('add.html', form=form, info=f'Dodano książkę pt. {form.title.data}')
+            REF.push(new_book)
+        return redirect(url_for('home'))
     # Render template
     return render_template('add.html', form=form, info='')
 

@@ -56,7 +56,8 @@
 							<div class="col-6">
 								<h2>Najnowsze książki:</h2>
 								<br>
-								{% for book in newest_books %}
+								<p class="emphasized">{{newest_books[0][1]}} - {{newest_books[0][0]}}</strong></p>
+								{% for book in newest_books[1:] %}
 								<p><em>{{book[1]}}</em> - {{book[0]}}</p>
 								{% endfor %}
 							</div>

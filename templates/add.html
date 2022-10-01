@@ -39,7 +39,7 @@
 						<h1>Dodaj książkę</h1>
 						<form method="POST" action="{{ url_for('submit_book') }}" novalidate>
 							{{ form.csrf_token }}
-    						<div>{{ form.author.label }}{{ form.author() }}</div>
+							<div><p>Autor<span class="emphasized"> (NAZWISKO, IMIĘ)</span></p>{{ form.author() }}</div>
 							<div>{{ form.title.label }}{{ form.title() }}</div>
 							{% for error in form.title.errors %}
 							<p class="error-message">{{ error }}</p>
