@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "bookclub2-0"
+version = "0.1.0"
+description = "An app for book exchange"
+authors = ["Jarema Piekutowski <jarema.piekutowski@gmail.com>"]
+readme = "README.md"
+packages = [{include = "bookclub2"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

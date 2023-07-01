@@ -1,7 +1,11 @@
+# TODO - v2.0:
+#  Update and clean database ("Agnieszka Mościcka/Agniieszka Mościcka",
+#  "Ania Błazejewska/Ania Błażejewska, "Joanna R/Joanna Rybus")
+
 # TODO - v3.0:
 #  Add user ranking
-#  Add table sorting and filtering - dropdown
 #  Add book search - form
+#  Add table sorting and filtering - dropdown
 #  Add user stats - form + search
 #  Add book adding - dropdown for genre
 #  Book adding - add new user
@@ -11,32 +15,7 @@
 #  Logging in
 
 
-# DONE:
-#  Create basic frontend for the app (index.html)
-#  Create database - Pandas
-#  Book display - table
-#  Better book display. Make the table responsive: https://css-tricks.com/responsive-data-tables
-#  Book adding - form
-#  Add book ID (index)
-#  Adding book_database - dropdown with users and genre
-#  Table sorting with Polish letters
-#  FIXED: Table sorting
-#  Add info that a book's been added BELOW the form - add.html/main.py
-#  Prevent adding the same book another time (check [author and title] duplicates)
-#  Installed and imported firebase (NO COMMIT YET)
-#  Created a firebase of books
-#  Complete migration to Firebase
-#  Security issue 1: Flask SECRET_KEY to env
-#  Adding books to firebase
-#  Replace "1899-12-31" by "brak"
-#  Book add route: date to serial number
-#  Authentication to env/Heroku config variables
-#  Heroku deployment
-#  Heroku config vars setting: https://devcenter.heroku.com/articles/config-vars
-
-
 import os
-import json
 from flask import Flask, render_template, redirect, url_for
 from flask_wtf import FlaskForm
 import wtforms
@@ -70,7 +49,10 @@ my_credentials = {
 cred = credentials.Certificate(my_credentials)
 
 # Initialize app
-firebase_admin.initialize_app(cred, {'databaseURL': 'https://bookclub-b2db5-default-rtdb.europe-west1.firebasedatabase.app/'})
+firebase_admin.initialize_app(
+    cred,
+    {'databaseURL': 'https://bookclub-b2db5-default-rtdb.europe-west1.firebasedatabase.app/'}
+    )
 
 # Set reference to the database
 REF = db.reference("/books")
@@ -107,11 +89,11 @@ def get_users() -> list:
 def prepare_to_display(data: pd.DataFrame) -> dict:
     data_to_display = data.fillna(value="brak").iloc[:, :7].drop_duplicates(subset='tytul').copy()
     data_to_display = data_to_display.set_index('tytul')
-    data_to_display['data'] = [upload_date if upload_date > dt.date(1900, 1, 1) else "brak" for upload_date in data_to_display['data']]
+    data_to_display['data'] = [upload_date if upload_date > dt.date(1900, 1, 1) else "brak"
+                               for upload_date in data_to_display['data']]
     data_to_display = data_to_display.reindex(sorted(data_to_display.index,
                                                      key=functools.cmp_to_key(locale.strcoll))).reset_index()
     data_to_display = data_to_display.iloc[:, [0, 1, 2, 3, 5, 4]]
-    print(data_to_display.columns)
     return {'columns': ['Tytuł', 'Autor', 'Data', 'Dziedzina', 'Wrzucający/a', 'Recenzja'],
             'values': data_to_display.values.tolist()}
 
